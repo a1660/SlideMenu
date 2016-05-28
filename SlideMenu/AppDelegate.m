@@ -7,19 +7,44 @@
 //
 
 #import "AppDelegate.h"
+#import "MainViewController.h"
+#import "LeftMenuController.h"
+#import "SlideMenuController.h"
 
 @interface AppDelegate ()
-
+@property (strong, nonatomic) SlideMenuController *sideMenuController;
 @end
 
 @implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    [self resgisterNoti];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    MainViewController *mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    UINavigationController *navigationController = [[UINavigationController alloc] initWithRootViewController:mainViewController];
+    
+    LeftMenuController *leftMenuViewController = [[LeftMenuController alloc] init];
+    self.sideMenuController = [[SlideMenuController alloc] initWithContentViewController:navigationController leftMenuViewController:leftMenuViewController];
+    self.sideMenuController.backgroundImage = [UIImage imageNamed:@"slide_bg.jpg"];
+    self.window.rootViewController = self.sideMenuController;
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+
     return YES;
 }
-
+- (void)resgisterNoti
+{
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(operatedSlideMenuVC:) name:@"operatedSlideMenuVC" object:nil];
+}
+- (void)operatedSlideMenuVC:(NSNotification *)noti
+{
+    [self.sideMenuController showMenu];
+}
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"operatedSlideMenuVC" object:nil];;
+}
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
